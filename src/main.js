@@ -1,6 +1,25 @@
 import IMask from "imask"
 import "./css/index.css"
 
+const ccBgColors01 = document.querySelector('.cc-bg svg > g g:nth-child(1) path')
+const ccBgColors02 = document.querySelector('.cc-bg svg > g g:nth-child(2) path')
+const ccLogo = document.querySelector('.cc-logo span:nth-child(2) img')
+
+function setCardType(type) {
+  const colors = {
+    visa: ['#4336d9', '#2d57f2'],
+    mastercard: ['#d76f29', '#c69347'],
+    rocketseat: ['#0d6f5d', '#c3129c'],
+    default: ['black', 'gray']
+  }
+
+  ccBgColors01.setAttribute('fill', colors[type][0])
+  ccBgColors02.setAttribute('fill', colors[type][1])
+  ccLogo.setAttribute('src', `cc-${type}.svg`)
+}
+
+globalThis.setCardType = setCardType
+
 
 const securityCode = document.querySelector('#security-code')
 const securityCodePattern = {
@@ -89,8 +108,61 @@ const cardsDynamicMasks = {
     const foundMask = dynamicMasked.compiledMasks.find(function (item) {
       return number.match(item.regex)
     })
-    console.log(foundMask)
     return foundMask
   }
 }
 const cardNumberMasked = IMask(cardNumber, cardsDynamicMasks)
+
+
+const addButton = document.querySelector('#add-card')
+
+addButton.addEventListener('click', () => {
+
+})
+
+addButton.addEventListener('submit', (event) => {
+  event.preventDefault()
+})
+
+const cardHolder = document.querySelector('#card-holder')
+cardHolder.addEventListener('input', () => {
+  const ccHolder = document.querySelector('.cc-holder .value')
+  ccHolder.innerHTML = cardHolder.value.length > 0
+    ? cardHolder.value
+    : 'FULANO DA SILVA'
+})
+
+
+// Security card
+securityCodeMasked.on('accept', () => {
+
+  updateSecurityCode(securityCodeMasked.value)
+})
+
+function updateSecurityCode(code) {
+  const ccSecurity = document.querySelector('.cc-security .value')
+  ccSecurity.innerHTML = code.length === 0 ? '123' : code
+}
+
+
+// Number Card
+cardNumberMasked.on('accept', () => {
+  const cardType = cardNumberMasked.masked.currentMask.cardtype
+  setCardType(cardType)
+  updateCardNumber(cardNumberMasked.value)
+})
+
+function updateCardNumber(value) {
+  const ccNumber = document.querySelector('.cc-number')
+  ccNumber.innerHTML = value.length === 0 ? '1234 5678 9012 3456' : value
+}
+
+// Expiration Card
+expirationDateMasked.on('accept', () => {
+  updateExpirationDate(expirationDateMasked.value)
+})
+
+function updateExpirationDate(date) {
+  const ccExpirate = document.querySelector('.cc-extra .value')
+  ccExpirate.innerHTML = date.length === 0 ? '02/32' : date
+}
